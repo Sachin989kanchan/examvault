@@ -726,7 +726,7 @@ const getAllExams = async (req, res) => {
       JOIN categories c ON c.id = e.category_id
       LEFT JOIN papers p ON p.exam_id = e.id
       ${where}
-      GROUP BY e.id
+     GROUP BY e.id, e.name, e.slug, e.difficulty, e.is_active, e.created_at, c.name
       ORDER BY c.name ASC, e.name ASC
     `, params);
 
