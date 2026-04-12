@@ -222,31 +222,39 @@ const searchExams = async (req, res) => {
   }
 };
 
-// Get popular/featured papers
+// get Fetuared papers
 const getFeaturedPapers = async (req, res) => {
   try {
-    // cache for getfeatured papers
     const cached = cache.get('featured_papers');
     if (cached) return sendSuccess(res, cached);
 
     const [papers] = await db.query(`
-      SELECT p.id, p.title, p.difficulty, p.duration_minutes, p.total_questions,
+      SELECT 
+        p.id, p.title, p.difficulty, p.duration_minutes, p.total_questions,
         p.total_marks, p.year, p.is_free,
-        e.name as exam_name, e.slug as exam_slug,
-        c.name as category_name, c.slug as category_slug, c.icon as category_icon,
-        COUNT(a.id) as attempt_count
+        e.name        AS exam_name,
+        e.slug        AS exam_slug,
+        c.name        AS category_name,
+        c.slug        AS category_slug,
+        c.icon        AS category_icon,
+        COALESCE(agg.attempt_count, 0) AS attempt_count
       FROM papers p
-      JOIN exams e ON e.id = p.exam_id
-      JOIN categories c ON c.id = e.category_id
-      LEFT JOIN attempts a ON a.paper_id = p.id
-      WHERE p.is_active = 1 AND e.is_active = 1
-      GROUP BY p.id
+      JOIN exams      e   ON e.id = p.exam_id
+      JOIN categories c   ON c.id = e.category_id
+      LEFT JOIN (
+        SELECT paper_id, COUNT(id) AS attempt_count
+        FROM attempts
+        GROUP BY paper_id
+      ) agg ON agg.paper_id = p.id
+      WHERE p.is_active = 1
+        AND e.is_active = 1
       ORDER BY attempt_count DESC, p.created_at DESC
       LIMIT 8
     `);
-    cache.set('featured_papers', papers, 120); // 2 minutes
 
+    cache.set('featured_papers', papers, 120);
     return sendSuccess(res, papers);
+
   } catch (err) {
     return sendError(res, 'Failed to fetch featured papers', 500);
   }
@@ -720,8 +728,7 @@ const getAllExams = async (req, res) => {
       JOIN categories c ON c.id = e.category_id
       LEFT JOIN papers p ON p.exam_id = e.id
       ${where}
-      GROUP BY e.id
-      ORDER BY c.name ASC, e.name ASC
+      GROUP BY e.id, e.name, e.slug, e.difficulty, e.is_active, e.created_at, c.name      ORDER BY c.name ASC, e.name ASC
     `, params);
 
     return sendSuccess(res, exams);
