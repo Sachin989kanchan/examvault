@@ -255,7 +255,6 @@ const getFeaturedPapers = async (req, res) => {
     return sendSuccess(res, papers);
 
   } catch (err) {
-    console.error('[getFeaturedPapers]', err.message);
     return sendError(res, 'Failed to fetch featured papers', 500);
   }
 };
