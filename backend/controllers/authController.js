@@ -75,8 +75,8 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const maxAttempts = parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5;
-    const lockMinutes = parseInt(process.env.LOCK_TIME_MINUTES) || 3;
+    //const maxAttempts = parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5;
+    // const lockMinutes = parseInt(process.env.LOCK_TIME_MINUTES) || 3;
 
     const [users] = await db.execute(
       'SELECT * FROM users WHERE email = ?', [email]
@@ -84,7 +84,12 @@ const login = async (req, res) => {
 
     if (!users.length) return sendError(res, 'Invalid credentials', 401);
 
+
     const user = users[0];
+
+    const isAdmin = user.role === 'super_admin' || user.role === 'admin';
+    const maxAttempts = isAdmin ? 20 : (parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5);
+    const lockMinutes = isAdmin ? 1 : (parseInt(process.env.LOCK_TIME_MINUTES) || 15);
 
     // ✅ Bug Fix 1: Use explicit UTC comparison via getTime()
     const now = Date.now();

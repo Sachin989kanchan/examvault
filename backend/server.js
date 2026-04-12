@@ -49,7 +49,9 @@ const limiter = rateLimit({
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 50,          // ← 10 se 50 karo
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { success: false, message: 'Too many auth attempts, please try again later.' }
 });
 app.use('/api/', limiter);
