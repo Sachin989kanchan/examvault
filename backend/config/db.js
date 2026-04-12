@@ -10,18 +10,17 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 50,
   queueLimit: 50,
-
   connectTimeout: 10000,
-  idleTimeout: 60000,    // release idle connections after 60s
-
+  idleTimeout: 60000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   timezone: '+00:00',
   ssl: {
     rejectUnauthorized: false
   }
+
+
+
 });
-
-
 
 module.exports = pool;

@@ -60,7 +60,6 @@ const getExamsByCategory = async (req, res) => {
     return sendError(res, 'Failed to fetch exams', 500);
   }
 };
-
 // Get papers by exam
 const getPapersByExam = async (req, res) => {
   try {
@@ -259,7 +258,6 @@ const getFeaturedPapers = async (req, res) => {
     return sendError(res, 'Failed to fetch featured papers', 500);
   }
 };
-
 // ADMIN: Create category
 const createCategory = async (req, res) => {
   try {
@@ -728,7 +726,12 @@ const getAllExams = async (req, res) => {
       JOIN categories c ON c.id = e.category_id
       LEFT JOIN papers p ON p.exam_id = e.id
       ${where}
+<<<<<<< HEAD
       GROUP BY e.id, e.name, e.slug, e.difficulty, e.is_active, e.created_at, c.name      ORDER BY c.name ASC, e.name ASC
+=======
+     GROUP BY e.id, e.name, e.slug, e.difficulty, e.is_active, e.created_at, c.name
+      ORDER BY c.name ASC, e.name ASC
+>>>>>>> fa1bc95affa10054a73b3312633121f799aaa186
     `, params);
 
     return sendSuccess(res, exams);
