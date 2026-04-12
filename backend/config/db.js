@@ -9,7 +9,6 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'examvault',
   waitForConnections: true,
   connectionLimit: 50,
-
   queueLimit: 50,
 
   connectTimeout: 10000,
@@ -18,6 +17,9 @@ const pool = mysql.createPool({
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   timezone: '+00:00',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 
