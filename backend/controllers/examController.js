@@ -229,7 +229,7 @@ const getFeaturedPapers = async (req, res) => {
     const cached = cache.get('featured_papers');
     if (cached) return sendSuccess(res, cached);
 
-    const [papers] = await db.execute(`
+    const [papers] = await db.query(`
       SELECT p.id, p.title, p.difficulty, p.duration_minutes, p.total_questions,
         p.total_marks, p.year, p.is_free,
         e.name as exam_name, e.slug as exam_slug,
