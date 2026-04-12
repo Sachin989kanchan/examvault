@@ -1,6 +1,12 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 const sendOTPEmail = async (toEmail, otp, type = 'verify') => {
   const isReset = type === 'reset';
@@ -10,8 +16,8 @@ const sendOTPEmail = async (toEmail, otp, type = 'verify') => {
     ? 'You requested a password reset. Use the OTP below:'
     : 'Thank you for registering! Please verify your email using the OTP below:';
 
-  await resend.emails.send({
-    from: 'onboarding@resend.dev',
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM,
     to: toEmail,
     subject,
     html: `
