@@ -18,7 +18,7 @@ const pool = mysql.createPool({
   ssl: {
     rejectUnauthorized: false
   }
-}); // ← pehle createPool band karo
+
 
 
 });
