@@ -10,22 +10,21 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 50,
   queueLimit: 50,
-
   connectTimeout: 10000,
-  idleTimeout: 60000,    // release idle connections after 60s
-
+  idleTimeout: 60000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
   timezone: '+00:00',
   ssl: {
     rejectUnauthorized: false
   }
-  pool.on('connection', (connection) => {
+}); // ← pehle createPool band karo
+
+// ✅ Phir pool.on bahar
+pool.on('connection', (connection) => {
   connection.query(
     "SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'"
   );
 });
-
-
 
 module.exports = pool;
