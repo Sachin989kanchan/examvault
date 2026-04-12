@@ -75,12 +75,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    //const maxAttempts = parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5;
-<<<<<<< HEAD
-    // const lockMinutes = parseInt(process.env.LOCK_TIME_MINUTES) || 3;
-=======
-   // const lockMinutes = parseInt(process.env.LOCK_TIME_MINUTES) || 3;
->>>>>>> 308797cb26ec2b1c1b5782e9865a862a2309da0e
 
     const [users] = await db.execute(
       'SELECT * FROM users WHERE email = ?', [email]
@@ -90,17 +84,10 @@ const login = async (req, res) => {
 
 
     const user = users[0];
-<<<<<<< HEAD
-
     const isAdmin = user.role === 'super_admin' || user.role === 'admin';
     const maxAttempts = isAdmin ? 20 : (parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5);
     const lockMinutes = isAdmin ? 1 : (parseInt(process.env.LOCK_TIME_MINUTES) || 15);
 
-=======
-const isAdmin = user.role === 'admin';
-const maxAttempts = isAdmin ? 20 : (parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5);
-const lockMinutes = isAdmin ? 1 : (parseInt(process.env.LOCK_TIME_MINUTES) || 15);
->>>>>>> 308797cb26ec2b1c1b5782e9865a862a2309da0e
     // ✅ Bug Fix 1: Use explicit UTC comparison via getTime()
     const now = Date.now();
     const lockedUntil = user.locked_until ? new Date(user.locked_until).getTime() : null;
