@@ -1,7 +1,3 @@
-
-
-
-
 require('dotenv').config();
 
 process.on('uncaughtException', (err) => {
@@ -20,8 +16,10 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const db = require('./config/db');
 const cache = require('./utils/cache');
+
 const app = express();
 app.set('trust proxy', 1);
+
 // Security
 app.use(helmet());
 app.use(compression());
@@ -36,7 +34,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma']
 }));
-
 app.options('*', cors());
 
 // Rate limiting
@@ -49,7 +46,7 @@ const limiter = rateLimit({
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 50,          // ← 10 se 50 karo
+  max: 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, message: 'Too many auth attempts, please try again later.' }
@@ -71,10 +68,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Health check
-//app.get('/health', (req, res) => {
-//res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
-//});
-// Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -83,6 +76,12 @@ app.get('/health', (req, res) => {
     cache: { size: cache.size }
   });
 });
+
+// Ping (for cron-job.org keep-alive)
+app.get('/ping', (req, res) => {
+  res.json({ success: true, message: 'pong' });
+});
+
 // No-cache for all API responses
 app.use('/api', (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
@@ -110,7 +109,6 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, async () => {
-  // ✅ DB connection check on startup
   try {
     await db.execute('SELECT 1');
     console.log('✅ MySQL connected successfully');
@@ -124,7 +122,7 @@ const server = app.listen(PORT, async () => {
   console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}\n`);
 });
 
-// ✅ Graceful shutdown
+// Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('⚠️ SIGTERM received. Closing server...');
   server.close(() => {
