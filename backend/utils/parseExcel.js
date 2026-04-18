@@ -1,6 +1,6 @@
 const XLSX = require('xlsx');
 
-const VALID_OPTIONS     = ['a', 'b', 'c', 'd'];
+const VALID_OPTIONS     = ['a', 'b', 'c', 'd', 'e'];
 const VALID_DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 const str = (val) => (val === undefined || val === null ? '' : String(val).trim());
@@ -14,6 +14,7 @@ const resolveRow = (raw) => ({
   option_b:       str(raw.option_b       ?? raw['Option B']       ?? raw['OptionB']   ?? ''),
   option_c:       str(raw.option_c       ?? raw['Option C']       ?? raw['OptionC']   ?? ''),
   option_d:       str(raw.option_d       ?? raw['Option D']       ?? raw['OptionD']   ?? ''),
+  option_e:       str(raw.option_e       ?? raw['Option E']       ?? raw['OptionE']   ?? ''), // optional
   correct_option: str(raw.correct_option ?? raw['Correct Option'] ?? raw['Correct Answer'] ?? raw['Answer'] ?? '').toLowerCase(),
   explanation:    str(raw.explanation    ?? raw['Explanation']    ?? ''),
   difficulty:     str(raw.difficulty     ?? raw['Difficulty']     ?? 'medium').toLowerCase(),
@@ -54,9 +55,15 @@ const parseExcel = (buffer, paperIdOverride = null) => {
     if (!row.option_b)      rowErrors.push('option_b is required');
     if (!row.option_c)      rowErrors.push('option_c is required');
     if (!row.option_d)      rowErrors.push('option_d is required');
+    // option_e is optional — blank means the question only has 4 options
 
     if (!row.correct_option || !VALID_OPTIONS.includes(row.correct_option)) {
-      rowErrors.push(`correct_option must be one of: a, b, c, d (got "${row.correct_option}")`);
+      rowErrors.push(`correct_option must be one of: a, b, c, d, e (got "${row.correct_option}")`);
+    }
+
+    // If correct_option is 'e', option_e must not be blank
+    if (row.correct_option === 'e' && !row.option_e) {
+      rowErrors.push('correct_option is "e" but option_e is empty');
     }
 
     // ── paper_id: use override from UI, else validate from Excel ──────────
@@ -86,6 +93,7 @@ const parseExcel = (buffer, paperIdOverride = null) => {
         option_b:      row.option_b,
         option_c:      row.option_c,
         option_d:      row.option_d,
+        option_e:      row.option_e || null,   // null when blank — 4-option question
         correct_option: row.correct_option,
         explanation:   row.explanation || null,
         difficulty,
