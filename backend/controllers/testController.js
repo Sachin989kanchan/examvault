@@ -171,7 +171,7 @@ const getQuestionsForAttempt = async (paperId, paper, attemptId, userId) => {
     questions = [];
     for (const section of sections) {
       let [sectionQs] = await db.execute(
-        'SELECT id, question_text, option_a, option_b, option_c, option_d, section_id, sort_order FROM questions WHERE paper_id = ? AND section_id = ? ORDER BY sort_order ASC',
+        'SELECT id, question_text, option_a, option_b, option_c, option_d, option_e, section_id, sort_order FROM questions WHERE paper_id = ? AND section_id = ? ORDER BY sort_order ASC',
         [paperId, section.id]
       );
 
@@ -191,7 +191,7 @@ const getQuestionsForAttempt = async (paperId, paper, attemptId, userId) => {
     }
   } else {
     let [qs] = await db.execute(
-      'SELECT id, question_text, option_a, option_b, option_c, option_d, section_id, sort_order FROM questions WHERE paper_id = ? ORDER BY sort_order ASC',
+      'SELECT id, question_text, option_a, option_b, option_c, option_d, option_e, section_id, sort_order FROM questions WHERE paper_id = ? ORDER BY sort_order ASC',
       [paperId]
     );
 
@@ -238,11 +238,13 @@ const shuffleArray = (arr) => {
 };
 
 const shuffleOptions = (q) => {
+  // Build option list — include option_e only if it exists on this question
   const options = [
     { key: 'a', val: q.option_a },
     { key: 'b', val: q.option_b },
     { key: 'c', val: q.option_c },
     { key: 'd', val: q.option_d },
+    ...(q.option_e ? [{ key: 'e', val: q.option_e }] : []),
   ];
 
   // Fisher-Yates shuffle
@@ -252,15 +254,17 @@ const shuffleOptions = (q) => {
   }
 
   // Find the new position of the correct answer by original key
+  const allKeys = ['a', 'b', 'c', 'd', 'e'];
   const newCorrectIndex = options.findIndex(o => o.key === q.correct_option);
-  const newCorrectKey = ['a', 'b', 'c', 'd'][newCorrectIndex];
+  const newCorrectKey = allKeys[newCorrectIndex];
 
   return {
     ...q,
-    option_a: options[0].val,
-    option_b: options[1].val,
-    option_c: options[2].val,
-    option_d: options[3].val,
+    option_a: options[0]?.val ?? null,
+    option_b: options[1]?.val ?? null,
+    option_c: options[2]?.val ?? null,
+    option_d: options[3]?.val ?? null,
+    option_e: options[4]?.val ?? null,
     correct_option: newCorrectKey,
   };
 };
@@ -487,7 +491,7 @@ const getResult = async (req, res) => {
 
     // Get question-wise responses for review
     const [responses] = await db.execute(`
-      SELECT r.*, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+      SELECT r.*, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d, q.option_e,
         q.correct_option, q.explanation, q.difficulty, q.topic,
         s.name as section_name
       FROM responses r
