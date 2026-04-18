@@ -214,7 +214,7 @@ const BulkUploadModal = ({ open, onClose }) => {
             question_text · option_a · option_b · option_c · option_d · correct_option
           </p>
           <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">
-            Optional: section_id · explanation · difficulty · topic
+            Optional: option_e · section_id · explanation · difficulty · topic
           </p>
           <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-medium">
             ✓ paper_id is not needed — selected paper above will be used automatically
