@@ -346,14 +346,14 @@ const createPaper = async (req, res) => {
 const addQuestion = async (req, res) => {
   try {
     const {
-      paper_id, section_id, question_text, option_a, option_b, option_c, option_d,
+      paper_id, section_id, question_text, option_a, option_b, option_c, option_d, option_e,
       correct_option, explanation, difficulty, topic
     } = req.body;
 
     const [result] = await db.execute(`
-      INSERT INTO questions (paper_id, section_id, question_text, option_a, option_b, option_c, option_d, correct_option, explanation, difficulty, topic)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [paper_id, section_id || null, question_text, option_a, option_b, option_c, option_d, correct_option, explanation || null, difficulty || 'medium', topic || null]);
+      INSERT INTO questions (paper_id, section_id, question_text, option_a, option_b, option_c, option_d, option_e, correct_option, explanation, difficulty, topic)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [paper_id, section_id || null, question_text, option_a, option_b, option_c, option_d, option_e || null, correct_option, explanation || null, difficulty || 'medium', topic || null]);
 
     await db.execute(
       'UPDATE papers SET total_questions = (SELECT COUNT(*) FROM questions WHERE paper_id = ?) WHERE id = ?',
@@ -370,13 +370,13 @@ const addQuestion = async (req, res) => {
 const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    const { question_text, option_a, option_b, option_c, option_d, correct_option, explanation, difficulty, topic } = req.body;
+    const { question_text, option_a, option_b, option_c, option_d, option_e, correct_option, explanation, difficulty, topic } = req.body;
 
     await db.execute(`
-      UPDATE questions SET question_text=?, option_a=?, option_b=?, option_c=?, option_d=?,
+      UPDATE questions SET question_text=?, option_a=?, option_b=?, option_c=?, option_d=?, option_e=?,
         correct_option=?, explanation=?, difficulty=?, topic=?
       WHERE id=?
-    `, [question_text, option_a, option_b, option_c, option_d, correct_option, explanation, difficulty, topic, id]);
+    `, [question_text, option_a, option_b, option_c, option_d, option_e || null, correct_option, explanation, difficulty, topic, id]);
 
     return sendSuccess(res, {}, 'Question updated');
   } catch (err) {
@@ -576,7 +576,7 @@ const bulkUploadQuestions = async (req, res) => {
     // Using conn.query() (not execute()) because the placeholder
     // count is dynamic and server-side prepared statements do not
     // support this pattern reliably in all MySQL versions.
-    const placeholders = valid.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+    const placeholders = valid.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
     const values = valid.flatMap((q) => [
       q.paper_id,
       q.section_id,
@@ -585,6 +585,7 @@ const bulkUploadQuestions = async (req, res) => {
       q.option_b,
       q.option_c,
       q.option_d,
+      q.option_e,
       q.correct_option,
       q.explanation,
       q.difficulty,
@@ -593,7 +594,7 @@ const bulkUploadQuestions = async (req, res) => {
 
     await conn.query(
       `INSERT INTO questions
-         (paper_id, section_id, question_text, option_a, option_b, option_c, option_d,
+         (paper_id, section_id, question_text, option_a, option_b, option_c, option_d, option_e,
           correct_option, explanation, difficulty, topic)
        VALUES ${placeholders}`,
       values
