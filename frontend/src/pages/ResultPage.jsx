@@ -226,7 +226,16 @@ const ResultPage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="text-xs font-bold text-gray-500 mr-2">Q{i + 1}.</span>
-                    <span className="text-sm text-gray-800 dark:text-gray-200">{r.question_text}</span>
+                    <span
+                      className="text-sm text-gray-800 dark:text-gray-200"
+                      dangerouslySetInnerHTML={{
+                        __html: r.question_text
+                          ? r.question_text.includes('<')
+                            ? r.question_text
+                            : r.question_text.replace(/\n/g, '<br />')
+                          : ''
+                      }}
+                    />
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className={`text-xs font-bold ${isCorrect ? 'text-green-600' : isWrong ? 'text-red-600' : 'text-gray-400'}`}>
@@ -260,7 +269,16 @@ const ResultPage = () => {
                     {r.explanation && (
                       <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
                         <p className="text-xs font-bold text-blue-700 dark:text-blue-300 mb-1">Explanation</p>
-                        <p className="text-sm text-blue-800 dark:text-blue-200">{r.explanation}</p>
+                        <p
+                          className="text-sm text-blue-800 dark:text-blue-200"
+                          dangerouslySetInnerHTML={{
+                            __html: r.explanation
+                              ? r.explanation.includes('<')
+                                ? r.explanation
+                                : r.explanation.replace(/\n/g, '<br />')
+                              : ''
+                          }}
+                        />
                       </div>
                     )}
                   </div>
