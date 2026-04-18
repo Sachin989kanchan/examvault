@@ -7,26 +7,26 @@ const BulkUploadModal = ({ open, onClose }) => {
   const fileInputRef = useRef(null)
 
   // ── Paper selection state ────────────────────────────────────────────────────
-  const [categories, setCategories]   = useState([])
-  const [exams, setExams]             = useState([])
-  const [papers, setPapers]           = useState([])
+  const [categories, setCategories] = useState([])
+  const [exams, setExams] = useState([])
+  const [papers, setPapers] = useState([])
   const [selectedCat, setSelectedCat] = useState('')
   const [selectedExam, setSelectedExam] = useState('')
   const [selectedPaper, setSelectedPaper] = useState('')   // this is the paper_id
   const [loadingPapers, setLoadingPapers] = useState(false)
 
   // ── Upload state ─────────────────────────────────────────────────────────────
-  const [file, setFile]       = useState(null)
+  const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [result, setResult]   = useState(null)
-  const [error, setError]     = useState('')
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
 
   // Load categories once when modal opens
   useEffect(() => {
     if (open && categories.length === 0) {
       examAPI.getCategories()
         .then(r => setCategories(r.data.data || []))
-        .catch(() => {})
+        .catch(() => { })
     }
   }, [open])
 
@@ -77,7 +77,7 @@ const BulkUploadModal = ({ open, onClose }) => {
 
   const handleUpload = async () => {
     if (!selectedPaper) { setError('Please select a paper first.'); return }
-    if (!file)          { setError('Please select an .xlsx file first.'); return }
+    if (!file) { setError('Please select an .xlsx file first.'); return }
 
     const formData = new FormData()
     formData.append('file', file)
