@@ -15,7 +15,6 @@ const ALL_OPTION_LABELS = ['A', 'B', 'C', 'D', 'E']
 const getOptionKeys = (q) =>
   ALL_OPTION_KEYS.filter(k => q?.[`option_${k}`] != null && q[`option_${k}`] !== '')
 
-
 const TestPage = () => {
   const { paperId } = useParams()
   const [searchParams] = useSearchParams()
