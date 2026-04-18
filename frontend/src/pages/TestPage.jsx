@@ -9,8 +9,11 @@ import {
   X, Clock, AlertCircle, Maximize2
 } from 'lucide-react'
 
-const OPTION_LABELS = ['A', 'B', 'C', 'D']
-const OPTION_KEYS = ['a', 'b', 'c', 'd']
+const ALL_OPTION_KEYS   = ['a', 'b', 'c', 'd', 'e']
+const ALL_OPTION_LABELS = ['A', 'B', 'C', 'D', 'E']
+// Only render options that actually have text for the current question
+const getOptionKeys = (q) =>
+  ALL_OPTION_KEYS.filter(k => q?.[`option_${k}`] != null && q[`option_${k}`] !== '')
 
 const TestPage = () => {
   const { paperId } = useParams()
@@ -347,8 +350,9 @@ const TestPage = () => {
 
                 {/* Options */}
                 <div className="space-y-3">
-                  {OPTION_KEYS.map((key, i) => {
+                  {getOptionKeys(currentQ).map((key) => {
                     const optionText = currentQ[`option_${key}`]
+                    const labelIndex = ALL_OPTION_KEYS.indexOf(key)
                     const isSelected = responses[currentQ.id]?.selected === key
                     return (
                       <button
@@ -358,7 +362,7 @@ const TestPage = () => {
                       >
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold mr-3
                           ${isSelected ? 'bg-brand text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
-                          {OPTION_LABELS[i]}
+                          {ALL_OPTION_LABELS[labelIndex]}
                         </span>
                         {optionText}
                       </button>
