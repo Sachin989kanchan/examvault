@@ -342,9 +342,16 @@ const TestPage = () => {
                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-brand text-white text-sm font-bold flex items-center justify-center">
                       {globalQIndex + 1}
                     </span>
-                    <p className="text-gray-900 dark:text-white font-medium leading-relaxed text-base">
-                      {currentQ.question_text}
-                    </p>
+                    <div
+                      className="text-gray-900 dark:text-white font-medium leading-relaxed text-base"
+                      dangerouslySetInnerHTML={{
+                        __html: currentQ.question_text
+                          ? currentQ.question_text.includes('<')
+                            ? currentQ.question_text
+                            : currentQ.question_text.replace(/\n/g, '<br />')
+                          : ''
+                      }}
+                    />
                   </div>
                 </div>
 
