@@ -238,7 +238,7 @@ const ResultPage = () => {
 
                 {isOpen && (
                   <div className="px-4 pb-4 space-y-2">
-                    {['a', 'b', 'c', 'd'].map((key) => {
+                    {['a', 'b', 'c', 'd', 'e'].filter(key => r[`option_${key}`] != null && r[`option_${key}`] !== '').map((key) => {
                       const text = r[`option_${key}`]
                       const isSelected = r.selected_option === key
                       const isCorrectOpt = r.correct_option === key
